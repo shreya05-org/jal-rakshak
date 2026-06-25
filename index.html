@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jal Rakshak - AI-Powered River Contamination Monitoring</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#2C3E50;line-height:1.6;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+.hidden{display:none!important}
+.login-screen{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.login-card{background:white;border-radius:16px;padding:40px;max-width:500px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.login-header{text-align:center;margin-bottom:30px}
+.login-header h1{font-size:2.5em;color:#0077BE;margin-bottom:5px}
+.login-header .hindi{font-size:1.2em;color:#00A86B;margin-bottom:10px}
+.login-header .tagline{font-size:0.95em;color:#666;line-height:1.6}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:8px;font-weight:600;color:#2C3E50}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:1em;transition:border-color 0.3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#0077BE}
+.role-selection{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}
+.role-option{padding:20px;border:3px solid #ddd;border-radius:12px;text-align:center;cursor:pointer;transition:all 0.3s}
+.role-option:hover{border-color:#0077BE;transform:translateY(-2px)}
+.role-option.selected{border-color:#0077BE;background:#e7f3ff}
+.role-option .icon{font-size:2.5em;margin-bottom:10px}
+.role-option .title{font-weight:600;color:#0077BE;margin-bottom:5px}
+.role-option .description{font-size:0.85em;color:#666}
+.login-button,.submit-button,.scan-button{width:100%;padding:15px;background:linear-gradient(135deg,#0077BE 0%,#00A86B 100%);color:white;border:none;border-radius:8px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s}
+.login-button:hover,.submit-button:hover,.scan-button:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,119,190,0.3)}
+.login-button:disabled,.submit-button:disabled,.scan-button:disabled{opacity:0.6;cursor:not-allowed}
+header{background:linear-gradient(135deg,#0077BE 0%,#00A86B 100%);color:white;padding:30px 20px;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:30px;position:relative}
+header h1{font-size:2.5em;margin-bottom:5px;text-shadow:2px 2px 4px rgba(0,0,0,0.2)}
+header .hindi{font-size:1.1em;opacity:0.95;margin-bottom:10px}
+header .subtitle{font-size:1em;opacity:0.9;margin-bottom:5px}
+header .location{font-size:0.95em;opacity:0.85;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:20px;display:inline-block;margin-top:10px}
+.logout-button{position:absolute;top:20px;right:20px;padding:10px 20px;background:rgba(255,255,255,0.2);color:white;border:2px solid white;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s}
+.logout-button:hover{background:white;color:#0077BE}
+.user-info{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.2);padding:10px 20px;border-radius:8px;font-size:0.9em}
+.control-panel{background:white;border-radius:12px;padding:25px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.control-panel h2{color:#0077BE;font-size:1.5em;flex:1;min-width:200px}
+.scan-button{width:auto;padding:15px 40px}
+.status-indicator{display:flex;align-items:center;gap:10px;padding:10px 20px;background:#f8f9fa;border-radius:8px;font-weight:600}
+.status-dot{width:12px;height:12px;border-radius:50%;animation:pulse 2s infinite}
+.status-dot.active{background:#28A745}
+.status-dot.scanning{background:#FFC107}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.citizen-view{max-width:800px;margin:0 auto}
+.report-card,.tool-card{background:white;border-radius:12px;padding:30px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:25px}
+.report-card h2,.tool-card h3{color:#0077BE;margin-bottom:20px;font-size:1.8em;border-bottom:3px solid #00A86B;padding-bottom:10px}
+.checkbox-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.checkbox-label{display:flex;align-items:center;gap:10px;padding:10px;background:#f8f9fa;border-radius:8px;cursor:pointer;transition:background 0.3s}
+.checkbox-label:hover{background:#e9ecef}
+.checkbox-label input[type="checkbox"]{width:20px;height:20px;cursor:pointer}
+textarea{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:1em;resize:vertical;min-height:100px}
+.file-upload{padding:20px;border:2px dashed #ddd;border-radius:8px;text-align:center;cursor:pointer;transition:all 0.3s}
+.file-upload:hover{border-color:#0077BE;background:#f8f9fa}
+.file-upload input[type="file"]{display:none}
+.confirmation-message{background:#d4edda;border:2px solid #28A745;border-radius:12px;padding:30px;text-align:center;margin-top:20px}
+.confirmation-message h3{color:#28A745;font-size:1.8em;margin-bottom:15px}
+.confirmation-message p{color:#2C3E50;font-size:1.1em;line-height:1.8}
+.official-tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:30px}
+.tool-card h3{font-size:1.3em;border:none;padding:0}
+.action-severity{display:grid;gap:10px}
+.severity-item{padding:15px;border-radius:8px;border-left:4px solid #ddd;background:#f8f9fa}
+.severity-item.active{background:#e7f3ff;border-left-color:#0077BE}
+.severity-item.monitor{border-left-color:#28A745}
+.severity-item.advisory{border-left-color:#FFC107}
+.severity-item.restrict{border-left-color:#FF6B35}
+.severity-item.emergency{border-left-color:#DC3545}
+.severity-title{font-weight:600;color:#2C3E50;margin-bottom:5px}
+.severity-description{font-size:0.9em;color:#666}
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-bottom:30px}
+.station-card{background:white;border-radius:12px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:all 0.3s;border-left:5px solid #ddd}
+.station-card:hover{transform:translateY(-3px);box-shadow:0 6px 12px rgba(0,0,0,0.15)}
+.station-card.status-clean{border-left-color:#28A745}
+.station-card.status-moderate{border-left-color:#FFC107}
+.station-card.status-high{border-left-color:#FF6B35}
+.station-card.status-critical{border-left-color:#DC3545}
+.station-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.station-name{font-size:1.3em;font-weight:700;color:#0077BE}
+.status-badge{padding:5px 15px;border-radius:20px;font-size:0.85em;font-weight:600;text-transform:uppercase}
+.status-badge.clean{background:#28A745;color:white}
+.status-badge.moderate{background:#FFC107;color:#2C3E50}
+.status-badge.high{background:#FF6B35;color:white}
+.status-badge.critical{background:#DC3545;color:white}
+.citizen-reports-badge{display:inline-block;background:#667eea;color:white;padding:5px 12px;border-radius:15px;font-size:0.85em;margin-top:10px}
+.sensor-data{background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px}
+.sensor-data h4{color:#0077BE;margin-bottom:10px;font-size:0.9em;text-transform:uppercase;letter-spacing:0.5px}
+.sensor-reading{display:flex;justify-content:space-between;padding:5px 0;font-size:0.95em}
+.sensor-label{color:#666}
+.sensor-value{font-weight:600;color:#2C3E50}
+.sensor-value.alert{color:#DC3545}
+.detection-result,.spread-prediction{padding:15px;border-left:4px solid #FFC107;border-radius:6px;margin-bottom:15px;display:none}
+.detection-result{background:#fff3cd}
+.detection-result.show,.spread-prediction.show{display:block}
+.detection-result.critical{background:#f8d7da;border-left-color:#DC3545}
+.detection-result.high{background:#ffe5d9;border-left-color:#FF6B35}
+.detection-result h4{color:#DC3545;margin-bottom:8px;font-size:1em}
+.detection-result p,.spread-prediction p{font-size:0.9em;color:#2C3E50;line-height:1.6}
+.spread-prediction{background:#e7f3ff;border-left-color:#0077BE}
+.spread-prediction h4{color:#0077BE;margin-bottom:8px;font-size:1em}
+.alerts-section{background:white;border-radius:12px;padding:25px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+.alerts-section h2{color:#0077BE;margin-bottom:20px;font-size:1.8em;border-bottom:3px solid #00A86B;padding-bottom:10px}
+.alert-message{background:#f8f9fa;padding:20px;border-radius:8px;margin-bottom:15px;border-left:5px solid #0077BE;position:relative}
+.alert-message.critical{border-left-color:#DC3545;background:#fff5f5}
+.alert-message.high{border-left-color:#FF6B35;background:#fff8f5}
+.alert-message h3{color:#DC3545;margin-bottom:10px;font-size:1.2em}
+.alert-message pre{white-space:pre-wrap;font-family:'Courier New',monospace;font-size:0.9em;color:#2C3E50;line-height:1.8}
+.alert-actions{margin-top:15px;padding-top:15px;border-top:2px solid #ddd;display:flex;gap:10px;align-items:center}
+.alert-actions select{padding:8px 12px;border:2px solid #ddd;border-radius:6px;font-size:0.9em}
+.alert-actions button{padding:8px 20px;background:#28A745;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+.alert-actions button:hover{background:#218838}
+.action-taken-badge{background:#28A745;color:white;padding:8px 16px;border-radius:20px;font-size:0.9em;font-weight:600}
+.no-alerts{text-align:center;padding:40px;color:#666;font-size:1.1em}
+.loading{text-align:center;padding:20px;display:none}
+.loading.show{display:block}
+.loading-spinner{border:4px solid #f3f3f3;border-top:4px solid #0077BE;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;margin:0 auto 15px}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+footer{background:white;padding:20px;text-align:center;border-radius:12px;margin-top:30px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+footer p{margin:5px 0;color:#666}
+footer .hackathon-badge{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:10px 20px;border-radius:25px;margin-top:10px;font-weight:600}
+@media (max-width:768px){
+header h1{font-size:1.8em}
+.logout-button,.user-info{position:static;margin:10px auto;display:block;width:fit-content}
+.control-panel{flex-direction:column;text-align:center}
+.dashboard,.official-tools{grid-template-columns:1fr}
+.role-selection{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="loginScreen" class="login-screen">
+<div class="login-card">
+<div class="login-header">
+<h1>🌊 Jal Rakshak</h1>
+<p class="hindi">जल रक्षक (Guardian of Water)</p>
+<p class="tagline">AI-Powered River Contamination Monitoring<br><strong>Piloted on the Narmada River, India</strong></p>
+</div>
+<form id="loginForm">
+<div class="form-group">
+<label>Select Region/Country:</label>
+<select id="regionSelect">
+<option value="india" selected>🇮🇳 India (Active Pilot)</option>
+<option value="bangladesh" disabled>🇧🇩 Bangladesh (Coming Soon)</option>
+<option value="nepal" disabled>🇳🇵 Nepal (Coming Soon)</option>
+<option value="pakistan" disabled>🇵🇰 Pakistan (Coming Soon)</option>
+<option value="thailand" disabled>🇹🇭 Thailand (Coming Soon)</option>
+<option value="vietnam" disabled>🇻🇳 Vietnam (Coming Soon)</option>
+<option value="global" disabled>🌍 Global Expansion (Coming Soon)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Your Name:</label>
+<input type="text" id="userName" placeholder="Enter your name" required>
+</div>
+<div class="form-group">
+<label>Select Your Role:</label>
+</div>
+<div class="role-selection">
+<div class="role-option" data-role="citizen">
+<div class="icon">👤</div>
+<div class="title">Citizen / Public</div>
+<div class="description">Report contamination you observe</div>
+</div>
+<div class="role-option" data-role="official">
+<div class="icon">👔</div>
+<div class="title">Government Official</div>
+<div class="description">Access monitoring dashboard</div>
+</div>
+</div>
+<button type="submit" class="login-button" id="loginButton" disabled>Login to Jal Rakshak</button>
+</form>
+</div>
+</div>
+<div id="mainApp" class="hidden">
+<header>
+<div class="user-info" id="userInfo"></div>
+<button class="logout-button" onclick="logout()">🚪 Logout</button>
+<h1>🌊 Jal Rakshak</h1>
+<p class="hindi">जल रक्षक (Guardian of Water)</p>
+<p class="subtitle">AI-Powered River Contamination Monitoring System</p>
+<p class="location">📍 Currently Monitoring: Narmada River Network, Jabalpur, India</p>
+</header>
+<div class="container">
+<div id="citizenView" class="citizen-view hidden">
+<div class="report-card">
+<h2>📝 Report Water Contamination</h2>
+<p style="color:#666;margin-bottom:20px">Help us monitor river health by reporting what you observe.</p>
+<form id="citizenReportForm">
+<div class="form-group">
+<label>Location:</label>
+<select id="reportLocation" required>
+<option value="">Select a location...</option>
+<option value="gaurighat">Gaurighat</option>
+<option value="tilwaraghat">Tilwaraghat</option>
+<option value="city-drain">City Drain Outlet</option>
+<option value="bhedaghat">Bhedaghat</option>
+<option value="other">Other (specify below)</option>
+</select>
+</div>
+<div class="form-group hidden" id="otherLocationGroup">
+<label>Specify Location:</label>
+<input type="text" id="otherLocation" placeholder="Enter location details">
+</div>
+<div class="form-group">
+<label>What did you observe? (Select all that apply)</label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" name="observation" value="discoloration"><span>Water Discoloration</span></label>
+<label class="checkbox-label"><input type="checkbox" name="observation" value="foam"><span>Foam/Froth</span></label>
+<label class="checkbox-label"><input type="checkbox" name="observation" value="smell"><span>Bad Smell</span></label>
+<label class="checkbox-label"><input type="checkbox" name="observation" value="dead-fish"><span>Dead Fish</span></label>
+<label class="checkbox-label"><input type="checkbox" name="observation" value="sewage"><span>Visible Sewage</span></label>
+<label class="checkbox-label"><input type="checkbox" name="observation" value="trash"><span>Floating Trash</span></label>
+</div>
+</div>
+<div class="form-group">
+<label>Additional Description (Optional):</label>
+<textarea id="reportDescription" placeholder="Describe what you observed..."></textarea>
+</div>
+<div class="form-group">
+<label>Upload Photo (Optional):</label>
+<div class="file-upload" onclick="document.getElementById('photoUpload').click()">
+<input type="file" id="photoUpload" accept="image/*">
+<p>📷 Click to upload a photo</p>
+</div>
+<p id="fileName" style="margin-top:10px;color:#666;font-size:0.9em"></p>
+</div>
+<button type="submit" class="submit-button">📤 Submit Report</button>
+</form>
+</div>
+<div id="confirmationMessage" class="confirmation-message hidden">
+<h3>✅ Report Submitted Successfully!</h3>
+<p>Thank you for helping monitor our rivers. Your report has been added to the monitoring system.</p>
+<p style="margin-top:15px"><strong>Report ID:</strong> <span id="reportId"></span><br><strong>Location:</strong> <span id="confirmedLocation"></span></p>
+<button class="submit-button" onclick="resetCitizenForm()" style="margin-top:20px">Submit Another Report</button>
+</div>
+</div>
+<div id="officialView" class="hidden">
+<div class="control-panel">
+<div>
+<h2>🛰️ Real-Time Monitoring Dashboard</h2>
+<p style="color:#666;font-size:0.9em;margin-top:5px">Simulated satellite imagery + IoT sensor data</p>
+</div>
+<div class="status-indicator">
+<div class="status-dot active" id="statusDot"></div>
+<span id="statusText">System Ready</span>
+</div>
+<button class="scan-button" id="scanButton" onclick="runDetectionScan()">🔍 Run Detection Scan</button>
+</div>
+<div class="official-tools">
+<div class="tool-card">
+<h3>📊 Manual Data Input</h3>
+<p style="color:#666;margin-bottom:15px;font-size:0.9em">Input official lab readings to override simulated data</p>
+<div class="form-group">
+<label>Select Station:</label>
+<select id="manualDataStation">
+<option value="">Choose station...</option>
+<option value="gaurighat">Gaurighat</option>
+<option value="tilwaraghat">Tilwaraghat</option>
+<option value="city-drain">City Drain Outlet</option>
+<option value="bhedaghat">Bhedaghat</option>
+</select>
+</div>
+<div id="manualDataInputs" class="hidden">
+<div class="form-group"><label>pH:</label><input type="number" id="manualPH" step="0.1" min="0" max="14"></div>
+<div class="form-group"><label>Turbidity (NTU):</label><input type="number" id="manualTurbidity" step="0.1" min="0"></div>
+<div class="form-group"><label>DO (mg/L):</label><input type="number" id="manualDO" step="0.1" min="0"></div>
+<div class="form-group"><label>Fecal Coliform:</label><input type="number" id="manualFC" step="1" min="0"></div>
+<div class="form-group"><label>BOD (mg/L):</label><input type="number" id="manualBOD" step="0.1" min="0"></div>
+<button class="submit-button" onclick="submitManualData()">Update Station Data</button>
+</div>
+</div>
+<div class="tool-card">
+<h3>⚠️ Recommended Action Severity</h3>
+<div class="action-severity" id="actionSeverity">
+<div class="severity-item monitor active">
+<div class="severity-title">✅ Monitor</div>
+<div class="severity-description">Continue routine monitoring</div>
+</div>
+</div>
+</div>
+</div>
+<div class="loading" id="loadingIndicator">
+<div class="loading-spinner"></div>
+<p>🛰️ Analyzing satellite imagery and sensor data...</p>
+</div>
+<div class="dashboard" id="dashboard"></div>
+<div class="alerts-section">
+<h2>📢 Generated Alerts for Authorities</h2>
+<div id="alertsContainer"><div class="no-alerts">No alerts generated. Run detection scan to analyze current conditions.</div></div>
+</div>
+</div>
+<footer>
+<p><strong>Jal Rakshak (जल रक्षक)</strong> - Guardian of Water</p>
+<p style="margin:10px 0">Built as a scalable framework for global river monitoring</p>
+<p style="color:#0077BE;font-weight:600">Currently Piloted: Narmada River, Jabalpur, India</p>
+<div class="hackathon-badge">🌍 1M1B AI for Sustainability Internship</div>
+<p style="margin-top:15px;font-size:0.9em">Architecture designed to extend to any river system globally<br>Works completely offline | No API keys required</p>
+</footer>
+</div>
+</div>
+<script>
+let currentUser={name:'',role:'',region:'india'};
+let citizenReports={'gaurighat':0,'tilwaraghat':0,'city-drain':0,'bhedaghat':0};
+let alertActions={};
+let selectedRole='';
+const MONITORING_STATIONS=[
+{id:'gaurighat',name:'Gaurighat',location:'Upstream residential area',distance:0,sensors:{discoloration:75,foamCoverage:45,flowRate:2.3,turbiditySpike:180},baseline:{discoloration:15,foamCoverage:5,turbiditySpike:20}},
+{id:'tilwaraghat',name:'Tilwaraghat',location:'City center bathing ghat',distance:3.5,sensors:{discoloration:25,foamCoverage:12,flowRate:2.1,turbiditySpike:35},baseline:{discoloration:15,foamCoverage:5,turbiditySpike:20}},
+{id:'city-drain',name:'City Drain Outlet',location:'Major sewage discharge point',distance:5.2,sensors:{discoloration:95,foamCoverage:85,flowRate:1.8,turbiditySpike:320},baseline:{discoloration:15,foamCoverage:5,turbiditySpike:20}},
+{id:'bhedaghat',name:'Bhedaghat',location:'Downstream tourist area',distance:12.8,sensors:{discoloration:18,foamCoverage:8,flowRate:2.5,turbiditySpike:25},baseline:{discoloration:15,foamCoverage:5,turbiditySpike:20}}
+];
+const THRESHOLDS={discoloration:{moderate:30,high:50,critical:70},foamCoverage:{moderate:15,high:30,critical:50},turbiditySpike:{moderate:50,high:100,critical:200}};
+document.querySelectorAll('.role-option').forEach(opt=>{
+opt.addEventListener('click',function(){
+document.querySelectorAll('.role-option').forEach(o=>o.classList.remove('selected'));
+this.classList.add('selected');
+selectedRole=this.dataset.role;
+document.getElementById('loginButton').disabled=false;
+});
+});
+document.getElementById('loginForm').addEventListener('submit',function(e){
+e.preventDefault();
+const name=document.getElementById('userName').value.trim();
+const region=document.getElementById('regionSelect').value;
+if(!name||!selectedRole)return;
+currentUser={name,role:selectedRole,region};
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('mainApp').classList.remove('hidden');
+document.getElementById('userInfo').textContent=`👤 ${name} (${selectedRole==='citizen'?'Citizen':'Official'})`;
+if(selectedRole==='citizen'){
+document.getElementById('citizenView').classList.remove('hidden');
+document.getElementById('officialView').classList.add('hidden');
+}else{
+document.getElementById('citizenView').classList.add('hidden');
+document.getElementById('officialView').classList.remove('hidden');
+initializeDashboard();
+}
+});
+function logout(){
+currentUser={name:'',role:'',region:'india'};
+selectedRole='';
+document.getElementById('loginScreen').classList.remove('hidden');
+document.getElementById('mainApp').classList.add('hidden');
+document.getElementById('loginForm').reset();
+document.querySelectorAll('.role-option').forEach(o=>o.classList.remove('selected'));
+document.getElementById('loginButton').disabled=true;
+}
+document.getElementById('reportLocation').addEventListener('change',function(){
+const otherGroup=document.getElementById('otherLocationGroup');
+if(this.value==='other'){
+otherGroup.classList.remove('hidden');
+}else{
+otherGroup.classList.add('hidden');
+}
+});
+document.getElementById('photoUpload').addEventListener('change',function(){
+const fileName=document.getElementById('fileName');
+if(this.files.length>0){
+fileName.textContent='📷 '+this.files[0].name;
+}else{
+fileName.textContent='';
+}
+});
+document.getElementById('citizenReportForm').addEventListener('submit',function(e){
+e.preventDefault();
+const location=document.getElementById('reportLocation').value;
+const observations=Array.from(document.querySelectorAll('input[name="observation"]:checked')).map(cb=>cb.value);
+if(!location||observations.length===0){
+alert('Please select a location and at least one observation');
+return;
+}
+const reportId='CR-'+Date.now();
+const locationName=location==='other'?document.getElementById('otherLocation').value:MONITORING_STATIONS.find(s=>s.id===location)?.name||location;
+if(location!=='other'&&citizenReports[location]!==undefined){
+citizenReports[location]++;
+}
+document.getElementById('reportId').textContent=reportId;
+document.getElementById('confirmedLocation').textContent=locationName;
+document.querySelector('.report-card').classList.add('hidden');
+document.getElementById('confirmationMessage').classList.remove('hidden');
+});
+function resetCitizenForm(){
+document.getElementById('citizenReportForm').reset();
+document.getElementById('fileName').textContent='';
+document.getElementById('otherLocationGroup').classList.add('hidden');
+document.querySelector('.report-card').classList.remove('hidden');
+document.getElementById('confirmationMessage').classList.add('hidden');
+}
+document.getElementById('manualDataStation').addEventListener('change',function(){
+const inputs=document.getElementById('manualDataInputs');
+if(this.value){
+inputs.classList.remove('hidden');
+}else{
+inputs.classList.add('hidden');
+}
+});
+function submitManualData(){
+const stationId=document.getElementById('manualDataStation').value;
+if(!stationId)return;
+alert('Manual data updated for '+stationId+'. This would override simulated sensor data in a production system.');
+document.getElementById('manualDataStation').value='';
+document.getElementById('manualDataInputs').classList.add('hidden');
+}
+function initializeDashboard(){
+const dashboard=document.getElementById('dashboard');
+dashboard.innerHTML='';
+MONITORING_STATIONS.forEach(station=>{
+const card=document.createElement('div');
+card.className='station-card';
+card.id='station-'+station.id;
+const reportCount=citizenReports[station.id]||0;
+card.innerHTML=`
+<div class="station-header">
+<div class="station-name">${station.name}</div>
+<div class="status-badge">Pending</div>
+</div>
+<p style="color:#666;font-size:0.9em;margin-bottom:15px">${station.location}</p>
+${reportCount>0?`<div class="citizen-reports-badge">👥 Citizen Reports: ${reportCount}</div>`:''}
+<div class="sensor-data">
+<h4>📡 Simulated Sensor Readings</h4>
+<div class="sensor-reading"><span class="sensor-label">Discoloration:</span><span class="sensor-value">${station.sensors.discoloration}%</span></div>
+<div class="sensor-reading"><span class="sensor-label">Foam Coverage:</span><span class="sensor-value">${station.sensors.foamCoverage}%</span></div>
+<div class="sensor-reading"><span class="sensor-label">Flow Rate:</span><span class="sensor-value">${station.sensors.flowRate} m/s</span></div>
+<div class="sensor-reading"><span class="sensor-label">Turbidity Spike:</span><span class="sensor-value">${station.sensors.turbiditySpike}%</span></div>
+</div>
+<div class="detection-result" id="detection-${station.id}"><h4>🚨 Detection Result</h4><p></p></div>
+<div class="spread-prediction" id="spread-${station.id}"><h4>📊 Contamination Spread Prediction</h4><p></p></div>
+`;
+dashboard.appendChild(card);
+});
+}
+function runDetectionScan(){
+document.getElementById('scanButton').disabled=true;
+document.getElementById('statusDot').className='status-dot scanning';
+document.getElementById('statusText').textContent='Scanning...';
+document.getElementById('loadingIndicator').classList.add('show');
+document.getElementById('alertsContainer').innerHTML='<div class="no-alerts">Analyzing data...</div>';
+setTimeout(()=>{
+analyzeAllStations();
+document.getElementById('loadingIndicator').classList.remove('show');
+document.getElementById('scanButton').disabled=false;
+document.getElementById('statusDot').className='status-dot active';
+document.getElementById('statusText').textContent='Scan Complete';
+},2000);
+}
+function analyzeAllStations(){
+const alerts=[];
+MONITORING_STATIONS.forEach(station=>{
+const analysis=analyzeStation(station);
+updateStationCard(station,analysis);
+if(analysis.status!=='clean'){
+alerts.push({station,analysis});
+}
+});
+generateAlerts(alerts);
+updateActionSeverity(alerts);
+}
+function analyzeStation(station){
+const sensors=station.sensors;
+let score=0;
+const violations=[];
+if(sensors.discoloration>=THRESHOLDS.discoloration.critical){
+score+=4;
+violations.push({param:'Discoloration',value:sensors.discoloration,severity:'critical',message:`Critical discoloration (${sensors.discoloration}%)`});
+}else if(sensors.discoloration>=THRESHOLDS.discoloration.high){
+score+=3;
+violations.push({param:'Discoloration',value:sensors.discoloration,severity:'high',message:`High discoloration (${sensors.discoloration}%)`});
+}else if(sensors.discoloration>=THRESHOLDS.discoloration.moderate){
+score+=2;
+violations.push({param:'Discoloration',value:sensors.discoloration,severity:'moderate',message:`Moderate discoloration (${sensors.discoloration}%)`});
+}
+if(sensors.foamCoverage>=THRESHOLDS.foamCoverage.critical){
+score+=4;
+violations.push({param:'Foam',value:sensors.foamCoverage,severity:'critical',message:`Critical foam coverage (${sensors.foamCoverage}%)`});
+}else if(sensors.foamCoverage>=THRESHOLDS.foamCoverage.high){
+score+=3;
+violations.push({param:'Foam',value:sensors.foamCoverage,severity:'high',message:`High foam coverage (${sensors.foamCoverage}%)`});
+}else if(sensors.foamCoverage>=THRESHOLDS.foamCoverage.moderate){
+score+=2;
+violations.push({param:'Foam',value:sensors.foamCoverage,severity:'moderate',message:`Moderate foam coverage (${sensors.foamCoverage}%)`});
+}
+if(sensors.turbiditySpike>=THRESHOLDS.turbiditySpike.critical){
+score+=4;
+violations.push({param:'Turbidity',value:sensors.turbiditySpike,severity:'critical',message:`Critical turbidity spike (${sensors.turbiditySpike}%)`});
+}else if(sensors.turbiditySpike>=THRESHOLDS.turbiditySpike.high){
+score+=3;
+violations.push({param:'Turbidity',value:sensors.turbiditySpike,severity:'high',message:`High turbidity spike (${sensors.turbiditySpike}%)`});
+}else if(sensors.turbiditySpike>=THRESHOLDS.turbiditySpike.moderate){
+score+=2;
+violations.push({param:'Turbidity',value:sensors.turbiditySpike,severity:'moderate',message:`Moderate turbidity spike (${sensors.turbiditySpike}%)`});
+}
+let status='clean';
+if(score>=10)status='critical';
+else if(score>=6)status='high';
+else if(score>=3)status='moderate';
+let message='';
+if(status==='clean'){
+message='No sewage discharge detected. All parameters within normal ranges.';
+}else{
+message=`Sewage discharge detected: ${violations.map(v=>v.message).join(', ')}. `;
+if(status==='critical')message+='CRITICAL contamination level - immediate intervention required.';
+else if(status==='high')message+='HIGH contamination level - urgent action needed.';
+else message+='MODERATE contamination level - monitoring required.';
+}
+const spreadPrediction=calculateSpreadPrediction(station,status);
+return{status,score,violations,message,spreadPrediction};
+}
+function calculateSpreadPrediction(station,status){
+if(status==='clean')return null;
+const downstreamStations=MONITORING_STATIONS.filter(s=>s.distance>station.distance);
+if(downstreamStations.length===0){
+return{message:'This is the most downstream monitoring point. Contamination will continue flowing beyond monitored area.'};
+}
+const nextStation=downstreamStations[0];
+const distance=nextStation.distance-station.distance;
+const flowRate=station.sensors.flowRate;
+const timeHours=(distance*1000)/(flowRate*3600);
+return{nextStation:nextStation.name,distance:distance.toFixed(1),timeHours:timeHours.toFixed(1),message:`Contamination predicted to reach ${nextStation.name} (${distance.toFixed(1)} km downstream) in approximately ${timeHours.toFixed(1)} hours at current flow rate of ${flowRate} m/s.`};
+}
+function updateStationCard(station,analysis){
+const card=document.getElementById('station-'+station.id);
+const statusBadge=card.querySelector('.status-badge');
+const detectionResult=document.getElementById('detection-'+station.id);
+const spreadPrediction=document.getElementById('spread-'+station.id);
+card.className='station-card status-'+analysis.status;
+statusBadge.className='status-badge '+analysis.status;
+statusBadge.textContent=analysis.status.toUpperCase();
+if(analysis.status!=='clean'){
+detectionResult.classList.add('show',analysis.status);
+detectionResult.querySelector('p').textContent=analysis.message;
+}
+if(analysis.spreadPrediction){
+spreadPrediction.classList.add('show');
+spreadPrediction.querySelector('p').textContent=analysis.spreadPrediction.message;
+}
+}
+function generateAlerts(alerts){
+const container=document.getElementById('alertsContainer');
+if(alerts.length===0){
+container.innerHTML='<div class="no-alerts">✅ No contamination detected. All stations within normal parameters.</div>';
+return;
+}
+container.innerHTML='';
+alerts.forEach(alert=>{
+const station=alert.station;
+const analysis=alert.analysis;
+const alertDiv=document.createElement('div');
+alertDiv.className='alert-message '+analysis.status;
+const timestamp=new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'full',timeStyle:'long'});
+let alertText=`SEWAGE DISCHARGE ALERT - ${analysis.status.toUpperCase()} PRIORITY
+Madhya Pradesh Pollution Control Board / Jabalpur Municipal Corporation
+Generated: ${timestamp}
+
+LOCATION: ${station.name}, ${station.location}
+STATUS: ${analysis.status.toUpperCase()} CONTAMINATION DETECTED
+
+DETECTION DETAILS:
+${analysis.violations.map(v=>'• '+v.message).join('\n')}
+
+${analysis.spreadPrediction?`CONTAMINATION SPREAD PREDICTION:
+${analysis.spreadPrediction.message}
+
+`:''}RECOMMENDED ACTIONS:`;
+if(analysis.status==='critical'){
+alertText+=`
+1. IMMEDIATE shutdown of sewage discharge source
+2. Deploy emergency response team within 2 hours
+3. Issue public health warning to downstream communities
+4. Alert water treatment plants in affected areas
+5. Activate disaster management protocols
+
+URGENCY: CRITICAL - Immediate intervention required`;
+}else if(analysis.status==='high'){
+alertText+=`
+1. Investigate and identify sewage discharge source within 24 hours
+2. Issue advisory to downstream communities
+3. Increase monitoring frequency to every 4 hours
+4. Deploy field inspection team
+
+URGENCY: HIGH - Action required within 24 hours`;
+}else{
+alertText+=`
+1. Conduct source investigation within 48 hours
+2. Increase monitoring frequency
+3. Review sewage treatment plant operations
+
+URGENCY: MODERATE - Action required within 48 hours`;
+}
+const alertId='alert-'+station.id;
+alertDiv.innerHTML=`
+<h3>🚨 ALERT: ${station.name}</h3>
+<pre>${alertText}</pre>
+<div class="alert-actions" id="${alertId}">
+${alertActions[station.id]?`<span class="action-taken-badge">✅ Action Taken: ${alertActions[station.id]}</span>`:`
+<select id="action-${station.id}">
+<option value="">Select action taken...</option>
+<option value="Investigation Started">Investigation Started</option>
+<option value="Source Identified">Source Identified</option>
+<option value="Discharge Stopped">Discharge Stopped</option>
+<option value="Advisory Issued">Advisory Issued</option>
+<option value="Emergency Response">Emergency Response Activated</option>
+</select>
+<button onclick="markActionTaken('${station.id}')">Mark Action Taken</button>
+`}
+</div>
+`;
+container.appendChild(alertDiv);
+});
+}
+function markActionTaken(stationId){
+const select=document.getElementById('action-'+stationId);
+const action=select.value;
+if(!action)return;
+alertActions[stationId]=action;
+const actionsDiv=document.getElementById('alert-'+stationId);
+actionsDiv.innerHTML=`<span class="action-taken-badge">✅ Action Taken: ${action}</span>`;
+}
+function updateActionSeverity(alerts){
+const container=document.getElementById('actionSeverity');
+if(alerts.length===0){
+container.innerHTML='<div class="severity-item monitor active"><div class="severity-title">✅ Monitor</div><div class="severity-description">Continue routine monitoring</div></div>';
+return;
+}
+const maxSeverity=Math.max(...alerts.map(a=>a.analysis.status==='critical'?4:a.analysis.status==='high'?3:a.analysis.status==='moderate'?2:1));
+let html='';
+if(maxSeverity>=4){
+html='<div class="severity-item emergency active"><div class="severity-title">🚨 Emergency Response</div><div class="severity-description">Critical contamination - immediate action required</div></div>';
+}else if(maxSeverity>=3){
+html='<div class="severity-item restrict active"><div class="severity-title">⛔ Restrict Public Access</div><div class="severity-description">High contamination - restrict water use</div></div>';
+}else if(maxSeverity>=2){
+html='<div class="severity-item advisory active"><div class="severity-title">⚠️ Issue Advisory</div><div class="severity-description">Moderate contamination - issue public advisory</div></div>';
+}else{
+html='<div class="severity-item monitor active"><div class="severity-title">✅ Monitor</div><div class="severity-description">Continue routine monitoring</div></div>';
+}
+container.innerHTML=html;
+}
+console.log('🌊 Jal Rakshak initialized successfully!');
+</script>
+</body>
+</html>
