@@ -1,165 +1,68 @@
-# 🚀 Quick Start Guide - NarmadaGuard
+# Demo Guide — Jal Rakshak
 
-## For Hackathon Demo (5 Minutes)
+Notes for running through the prototype, mostly for myself before presenting, but useful if anyone else needs to try it.
 
-### Step 1: Open the Application (30 seconds)
-1. Double-click `index.html` in your file explorer
-2. The app opens in your default browser
-3. You'll see the NarmadaGuard interface with a beautiful gradient header
+## Opening it
 
-### Step 2: Configure API Key (1 minute)
-1. Get your Claude API key from: https://console.anthropic.com/
-2. Paste it in the "Claude API Key" field at the top of the form
-3. The key is stored locally - never sent anywhere except Anthropic
+Just double-click `index.html`, or open it with any browser. No API key, no install, no internet needed — everything runs locally in the browser.
 
-### Step 3: Demo Scenario 1 - Clean Water (1 minute)
-1. Click the **"✅ Clean Water"** button
-2. Notice the form auto-fills with safe parameter values
-3. Click **"🔍 Analyze Water Quality"**
-4. Wait 3-5 seconds for AI analysis
-5. **Point out**: "Low Risk" badge in green, AI reasoning, and positive health assessment
+## Walking through it
 
-### Step 4: Demo Scenario 2 - Critical Contamination (1 minute)
-1. Click the **"☠️ Critical Contamination"** button
-2. Form fills with dangerous values
-3. Click **"🔍 Analyze Water Quality"**
-4. **Point out**: 
-   - Red "Critical Risk" badge
-   - AI identifies specific pollution sources
-   - Urgent health warnings
-   - Actionable alert message for authorities
+**1. Login screen**
+Pick a region (India is the only active one right now, others show as "Coming Soon" — that's intentional, signals this is meant to scale beyond one river eventually). Enter any name, then choose a role: Citizen or Government Official.
 
-### Step 5: Highlight Key Features (1.5 minutes)
-Scroll down and show:
+**2. Citizen view**
+Pick a station from the dropdown (or "Other"), check off whatever's relevant — discoloration, foam, smell, dead fish — add a short note if you want, and submit. You'll see a confirmation, and that station's "citizen reports" count goes up on the official dashboard. This part has no real photo processing — the upload field is there for the interface, not functional yet.
 
-1. **Responsible AI Section**
-   - "We built this with ethics in mind"
-   - Show the 4 principle cards: Fairness, Transparency, Ethics, Privacy
+**3. Switch to Official view**
+Log out (or just open the role switch) and come back in as Government Official. This is where most of the actual system lives:
+- Four monitoring stations, each showing simulated sensor readings
+- Click "Run Detection Scan" — it checks all four stations and classifies each as Clean / Moderate / High / Critical
+- For anything flagged, it shows a rough prediction of when contamination would reach the next station downstream
+- You can manually enter lab readings (pH, turbidity, DO, coliform, BOD) for a station if you have real data to override the simulated values
+- Each flagged station generates an alert message addressed to MPCB / Jabalpur Municipal Corporation, and you can mark it "action taken" with a short note
 
-2. **Design Thinking Process**
-   - "We followed a structured methodology"
-   - Briefly mention the 5 stages
+## If something doesn't work
 
-3. **Real-world Impact**
-   - "This helps communities near Narmada River"
-   - "Enables faster response from pollution control authorities"
+- **Nothing happens on scan** — check the browser console (F12) for errors, and make sure you're not opening the file through some restrictive viewer; a normal browser tab should work fine.
+- **Citizen report doesn't show up on dashboard** — this only persists for the current browser session; refreshing the page resets everything, since there's no real backend.
+- **Login doesn't "remember" you** — that's expected. This is a demo-level login, not real authentication.
 
-## 🎯 Key Talking Points
+## Things worth saying out loud during a demo
 
-### Opening (30 seconds)
-> "NarmadaGuard is an AI-powered water quality monitoring system for the Narmada River in Jabalpur. It analyzes 5 key parameters and provides instant risk assessment, pollution source identification, and health impact analysis."
+- This is piloted on the Narmada near Jabalpur, but the architecture isn't tied to one river — the region selector and the underlying logic are built to extend elsewhere.
+- The sensor readings are simulated. I say this upfront rather than letting someone assume it's live satellite data — the detection and prediction logic itself is real and would work the same way with real input.
+- The risk classification is a transparent rule-based system, not a black-box model — I made that choice deliberately after running into cost and access issues trying to wire in an LLM, and it has the side benefit of being fully explainable.
 
-### During Demo (2 minutes)
-> "Notice how the AI doesn't just give a risk level - it explains its reasoning, identifies likely pollution sources based on the parameter patterns, and generates specific alerts for authorities. This is genuine AI analysis, not hardcoded rules."
+## Rough parameter reference
 
-### Responsible AI (1 minute)
-> "We've embedded responsible AI principles throughout. The system treats all samples fairly, provides transparent reasoning, prioritizes public health, and respects privacy by not storing any data."
+For the manual lab-data entry in the Official view:
 
-### Design Thinking (1 minute)
-> "We used design thinking methodology - starting with empathizing with communities who lack real-time water quality data, defining the problem clearly, ideating solutions, prototyping this web app, and planning for testing and refinement."
+| Parameter | Safe range | Where it starts becoming a problem |
+|---|---|---|
+| pH | 6.5–8.5 | Below 6.5 or above 8.5 |
+| Turbidity | < 5 NTU | Above 10 NTU |
+| Dissolved Oxygen | > 6 mg/L | Below 4 mg/L |
+| Fecal Coliform | < 500 MPN/100ml | Above 2000 |
+| BOD | < 3 mg/L | Above 6 mg/L |
 
-### Impact (30 seconds)
-> "This can help protect communities from waterborne diseases, enable faster pollution response, and empower citizens with information about their water quality."
+## What I'd say if someone pushes on the technical side
 
-## 🎬 Demo Script
+**"Is this connected to real sensors?"**
+No — right now it's simulated data, clearly labeled as such in the app. The detection and spread-prediction logic is real; it just doesn't have a live data source behind it yet.
 
-**[Open app]**
-"This is NarmadaGuard - let me show you how it works."
+**"Why rule-based instead of an actual AI model?"**
+I originally tried wiring this to an LLM (first OpenAI, then Claude), but ran into API cost and credit issues that weren't sustainable for a student project. Rather than fake it or quietly skip the problem, I switched to a transparent rule-based engine — which also means the reasoning is fully explainable, which matters for the Responsible AI side of this.
 
-**[Click Clean Water]**
-"First, let's test with clean water parameters. The AI analyzes all 5 parameters..."
-**[Wait for result]**
-"...and confirms low risk with detailed reasoning."
+**"How accurate is the spread prediction?"**
+It's a basic distance-divided-by-flow-rate calculation, not a hydrology model. It's meant to demonstrate the concept of an early-warning timeline, not give scientifically precise predictions.
 
-**[Click Critical Contamination]**
-"Now let's see a critical scenario. Same parameters, but severely contaminated..."
-**[Wait for result]**
-"...the AI immediately flags this as critical, identifies sewage contamination, warns about health risks, and generates an urgent alert for authorities."
+**"What would it take to make this real?"**
+Real satellite imagery (something like Sentinel-2) for the visual indicators, actual IoT water sensors for flow and turbidity, and a backend to persist citizen reports and official actions instead of resetting on refresh.
 
-**[Scroll to Responsible AI]**
-"We built this responsibly - with fairness, transparency, ethics, and privacy at the core."
+## Before presenting
 
-**[Scroll to Design Thinking]**
-"We followed design thinking methodology from empathy to testing."
-
-**[Close]**
-"This demonstrates how AI can help protect communities and enable faster environmental response. Thank you!"
-
-## ⚡ Troubleshooting
-
-### "AI analysis unavailable"
-- Check your API key is entered correctly
-- Verify internet connection
-- The app will show fallback analysis with a warning
-
-### Slow response
-- Normal for first request (3-5 seconds)
-- Subsequent requests are usually faster
-- Using Claude Sonnet for speed and quality
-
-### No results showing
-- Check browser console (F12) for errors
-- Ensure all form fields have valid numbers
-- Try refreshing the page
-
-## 📊 Parameter Cheat Sheet
-
-Quick reference for manual input:
-
-| Parameter | Safe | Warning | Critical |
-|-----------|------|---------|----------|
-| pH | 7.0-7.5 | 6.0-6.5 | <5.5 |
-| Turbidity | 2-4 NTU | 8-12 NTU | >30 NTU |
-| DO | 7-8 mg/L | 4-5 mg/L | <2 mg/L |
-| Fecal Coliform | 100-400 | 1000-3000 | >12000 |
-| BOD | 1-2 mg/L | 5-7 mg/L | >12 mg/L |
-
-## 🏆 Winning Points for Judges
-
-1. **Real AI Integration** - Not just rules, actual LLM reasoning
-2. **Responsible AI** - Ethics built-in from the start
-3. **Design Thinking** - Structured methodology documented
-4. **Real-world Impact** - Solves actual problem for Narmada communities
-5. **Accessibility** - Single file, works anywhere, no installation
-6. **Sustainability Focus** - Directly addresses environmental monitoring
-7. **Scalability** - Can be adapted to other rivers and regions
-
-## 💡 Advanced Demo Tips
-
-### If judges ask technical questions:
-
-**"How does the AI work?"**
-> "We use Anthropic's Claude AI with a carefully crafted system prompt that establishes it as an environmental scientist expert. It analyzes the parameters against Indian water quality standards and provides contextual reasoning specific to the Narmada River region."
-
-**"Why not use rules instead of AI?"**
-> "Rules are rigid and can't handle complex interactions between parameters. AI can recognize patterns, consider local context, and provide nuanced analysis that adapts to different scenarios."
-
-**"What about accuracy?"**
-> "The AI is trained on vast amounts of data and we've validated it against Indian standards (IS 2296). However, we clearly state this is a decision-support tool, not a replacement for professional testing."
-
-**"How do you ensure responsible AI?"**
-> "We've implemented four principles: fairness in treating all samples equally, transparency by showing AI reasoning, ethics by prioritizing public health, and privacy by not storing any data."
-
-## 🎯 Time Management
-
-- **2 min**: Introduction + Clean Water demo
-- **2 min**: Critical scenario + AI capabilities
-- **1 min**: Responsible AI principles
-- **30 sec**: Design Thinking process
-- **30 sec**: Impact and closing
-
-Total: **6 minutes** (leaves time for questions)
-
-## ✅ Pre-Demo Checklist
-
-- [ ] API key ready and tested
-- [ ] Browser open to index.html
-- [ ] Internet connection verified
-- [ ] Practiced demo flow
-- [ ] Prepared for technical questions
-- [ ] Confident about responsible AI principles
-- [ ] Ready to explain design thinking process
-
----
-
-**Good luck with your presentation! 🌊💚**
+- [ ] Open `index.html` once beforehand to make sure it still loads cleanly
+- [ ] Know which station you'll demo as "Critical" (City Drain Outlet usually shows the clearest result)
+- [ ] Be ready to say plainly what's simulated vs. real — that's a strength, not something to hide
+- [ ] Have the GitHub repo and live link ready to share
